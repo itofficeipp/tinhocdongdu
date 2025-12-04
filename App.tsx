@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { ShoppingCart, Search, Menu, Phone, Mail, Server, Facebook, Settings, Filter } from 'lucide-react';
-import { MOCK_PRODUCTS, STORE_NAME, CONTACT_PHONE, CONTACT_EMAIL } from './constants';
-import { Product, CartItem, Category } from './types';
+import { MOCK_PRODUCTS, STORE_NAME, CONTACT_PHONE, CONTACT_EMAIL, DEFAULT_BANNER_CONFIG } from './constants';
+import { Product, CartItem, Category, BannerConfig } from './types';
 import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
 import { ChatWidget } from './components/ChatWidget';
@@ -10,6 +10,7 @@ import { ProductDetailModal } from './components/ProductDetailModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ProductCarousel } from './components/ProductCarousel';
 import { ProductFilters } from './components/ProductFilters';
+import { FloatingAds } from './components/FloatingAds';
 
 // Extended interface for performance optimization
 interface ProcessedProduct extends Product {
@@ -20,6 +21,8 @@ interface ProcessedProduct extends Product {
 const App: React.FC = () => {
   // Product Data State (Moved from constant to state for Admin manipulation)
   const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
+  // Banner Config State
+  const [bannerConfig, setBannerConfig] = useState<BannerConfig>(DEFAULT_BANNER_CONFIG);
 
   // Default to the first category instead of 'ALL'
   const [selectedCategory, setSelectedCategory] = useState<string>(Category.PC_LAPTOP);
@@ -235,6 +238,9 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col">
+      {/* Floating Ads */}
+      <FloatingAds config={bannerConfig} />
+
       {/* Top Bar */}
       <div className="bg-gradient-to-r from-[#004d2a] to-[#006838] text-white py-2 px-4 text-xs sm:text-sm shadow-md z-50 relative">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -286,12 +292,12 @@ const App: React.FC = () => {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 ml-10 xl:ml-16">
+            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 ml-10 xl:ml-16 pr-8 mr-auto">
               {menuItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleCategoryClick(item.id)}
-                  className={`text-xs xl:text-sm font-bold uppercase transition-all relative py-2 group whitespace-nowrap ${
+                  className={`text-sm xl:text-base font-[800] uppercase transition-all relative py-2 group whitespace-nowrap tracking-wide ${
                     selectedCategory === item.id 
                       ? 'text-[#006838]' 
                       : 'text-gray-600 hover:text-[#006838]'
@@ -364,7 +370,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <div className="relative bg-[#006838] text-white overflow-hidden border-b border-green-800">
+      <div id="hero-section" className="relative bg-[#006838] text-white overflow-hidden border-b border-green-800">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-white opacity-[0.07] rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-white opacity-[0.05] rounded-full blur-3xl"></div>
         
@@ -484,7 +490,7 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#1a1a1a] text-gray-400 py-16">
+      <footer id="main-footer" className="bg-[#1a1a1a] text-gray-400 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <div className="flex items-center gap-2 mb-6">
@@ -534,30 +540,14 @@ const App: React.FC = () => {
           <div className="md:pl-10">
             <h3 className="text-white text-lg font-bold mb-6 uppercase tracking-wide border-l-4 border-[#006838] pl-3">Sản phẩm chính</h3>
             <ul className="space-y-4 text-sm font-medium">
-              <li>
-                <button onClick={() => handleCategoryClick(Category.PC_LAPTOP)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
-                  <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
-                  PC / Laptop Doanh Nghiệp
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleCategoryClick(Category.SERVER)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
-                  <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
-                  Mực in / Máy in Canon / HP
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleCategoryClick(Category.NETWORK)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
-                  <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
-                  Thiết bị mạng Cisco / Aruba
-                </button>
-              </li>
-               <li>
-                <button onClick={() => handleCategoryClick(Category.OTHER)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
-                  <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
-                  Lưu trữ NAS & Thiết bị khác
-                </button>
-              </li>
+              {menuItems.map((item) => (
+                <li key={item.id}>
+                  <button onClick={() => handleCategoryClick(item.id)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full uppercase">
+                    <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
+                    {item.label}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
           <div>
@@ -630,6 +620,8 @@ const App: React.FC = () => {
         onAddProduct={handleAddProduct}
         onUpdateProduct={handleUpdateProduct}
         onDeleteProduct={handleDeleteProduct}
+        bannerConfig={bannerConfig}
+        onUpdateBannerConfig={setBannerConfig}
       />
     </div>
   );

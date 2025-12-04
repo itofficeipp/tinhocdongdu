@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Product, Category } from '../types';
-import { X, Plus, Edit, Trash2, Save, Image as ImageIcon, Search, LayoutDashboard, Lock, Upload, Link as LinkIcon, LogOut, Star, KeyRound } from 'lucide-react';
+import { Product, Category, BannerConfig } from '../types';
+import { X, Plus, Edit, Trash2, Save, Image as ImageIcon, Search, LayoutDashboard, Lock, Upload, Link as LinkIcon, LogOut, Star, KeyRound, MonitorPlay } from 'lucide-react';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -10,6 +10,8 @@ interface AdminDashboardProps {
   onAddProduct: (product: Product) => void;
   onUpdateProduct: (product: Product) => void;
   onDeleteProduct: (id: string) => void;
+  bannerConfig: BannerConfig;
+  onUpdateBannerConfig: (config: BannerConfig) => void;
 }
 
 const emptyProduct: Product = {
@@ -29,7 +31,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   products,
   onAddProduct,
   onUpdateProduct,
-  onDeleteProduct
+  onDeleteProduct,
+  bannerConfig,
+  onUpdateBannerConfig
 }) => {
   // Auth State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,12 +44,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [storedPassword, setStoredPassword] = useState('123456');
 
   // Dashboard State
-  const [view, setView] = useState<'list' | 'form'>('list');
+  const [view, setView] = useState<'list' | 'form' | 'banners'>('list');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<Product>(emptyProduct);
   const [specsInput, setSpecsInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Banner Config Form State
+  const [bannerForm, setBannerForm] = useState<BannerConfig>(bannerConfig);
+
   // Change Password State
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
@@ -60,10 +67,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (!isOpen) {
       setView('list');
       setLoginError('');
-      // Optional: Uncomment next line to require login every time modal opens
-      // setIsAuthenticated(false); 
+    } else {
+        // Sync banner form with current config when opening
+        setBannerForm(bannerConfig);
     }
-  }, [isOpen]);
+  }, [isOpen, bannerConfig]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +122,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setEditingProduct(product);
     setFormData(product);
     setSpecsInput(product.specs.join('\n'));
-    // Auto detect if image is base64 (upload) or url
     setImageInputType(product.image.startsWith('data:') ? 'upload' : 'url');
     setView('form');
   };
@@ -167,6 +174,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleBannerUpload = (side: 'left' | 'right', e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setBannerForm(prev => ({
+                  ...prev,
+                  [side === 'left' ? 'leftImage' : 'rightImage']: reader.result as string
+              }));
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+
+  const handleSaveBanners = () => {
+      onUpdateBannerConfig(bannerForm);
+      alert('Đã cập nhật cấu hình Banner thành công!');
   };
 
   // Filter products
@@ -228,7 +254,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                Đăng Nhập
              </button>
            </form>
-           {/* Removed the default password hint as requested */}
         </div>
       </div>
     );
@@ -241,7 +266,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <div className="bg-[#006838] text-white px-6 py-4 shadow-md flex justify-between items-center shrink-0">
         <div className="flex items-center gap-3">
           <LayoutDashboard size={24} />
-          <h1 className="text-xl font-bold uppercase tracking-wide font-['Montserrat']">Quản Lý Sản Phẩm</h1>
+          <h1 className="text-xl font-bold uppercase tracking-wide font-['Montserrat']">Quản Lý Hệ Thống</h1>
         </div>
         <div className="flex items-center gap-4">
            <button onClick={() => setIsChangePasswordOpen(true)} className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-sm">
@@ -273,11 +298,123 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
                 <Plus size={18} /> Thêm sản phẩm mới
             </button>
+            <div className="h-px bg-gray-100 my-2"></div>
+             <button 
+                onClick={() => setView('banners')}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${view === 'banners' ? 'bg-green-50 text-[#006838]' : 'text-gray-600 hover:bg-gray-50'}`}
+            >
+                <MonitorPlay size={18} /> Cấu hình Banner QC
+            </button>
         </div>
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
             
+            {view === 'banners' && (
+                 <div className="max-w-4xl mx-auto animate-fade-in-up">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Cấu hình Banner Quảng cáo (2 bên)</h2>
+                    
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-8">
+                        <div className="flex items-center gap-3 mb-4">
+                            <input 
+                                type="checkbox"
+                                className="w-5 h-5 text-[#006838] rounded focus:ring-green-500"
+                                checked={bannerForm.isVisible}
+                                onChange={e => setBannerForm({...bannerForm, isVisible: e.target.checked})}
+                            />
+                            <label className="font-bold text-gray-700">Hiển thị Banner 2 bên (Chỉ hiện trên màn hình lớn)</label>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                             {/* Left Banner */}
+                             <div className="space-y-4">
+                                 <h3 className="font-bold text-lg text-gray-800 border-b pb-2">Banner Trái</h3>
+                                 
+                                 <div className="space-y-2">
+                                     <label className="text-sm font-semibold text-gray-600">Link Ảnh URL</label>
+                                     <input 
+                                         type="text"
+                                         className="w-full px-3 py-2 border rounded-lg text-sm"
+                                         value={bannerForm.leftImage}
+                                         onChange={e => setBannerForm({...bannerForm, leftImage: e.target.value})}
+                                     />
+                                 </div>
+                                 <div className="space-y-2">
+                                     <label className="text-sm font-semibold text-gray-600">Hoặc Tải ảnh lên</label>
+                                     <input type="file" accept="image/*" onChange={(e) => handleBannerUpload('left', e)} className="text-sm" />
+                                 </div>
+                                 
+                                 <div className="w-full h-64 border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                     {bannerForm.leftImage ? (
+                                         <img src={bannerForm.leftImage} className="w-full h-full object-cover" />
+                                     ) : (
+                                         <span className="text-gray-400">Chưa có ảnh</span>
+                                     )}
+                                 </div>
+                                 
+                                 <div className="space-y-2">
+                                     <label className="text-sm font-semibold text-gray-600">Link đích (Khi click vào)</label>
+                                     <input 
+                                         type="text"
+                                         className="w-full px-3 py-2 border rounded-lg text-sm"
+                                         value={bannerForm.leftLink}
+                                         onChange={e => setBannerForm({...bannerForm, leftLink: e.target.value})}
+                                         placeholder="#"
+                                     />
+                                 </div>
+                             </div>
+
+                             {/* Right Banner */}
+                             <div className="space-y-4">
+                                 <h3 className="font-bold text-lg text-gray-800 border-b pb-2">Banner Phải</h3>
+                                 
+                                 <div className="space-y-2">
+                                     <label className="text-sm font-semibold text-gray-600">Link Ảnh URL</label>
+                                     <input 
+                                         type="text"
+                                         className="w-full px-3 py-2 border rounded-lg text-sm"
+                                         value={bannerForm.rightImage}
+                                         onChange={e => setBannerForm({...bannerForm, rightImage: e.target.value})}
+                                     />
+                                 </div>
+                                 <div className="space-y-2">
+                                     <label className="text-sm font-semibold text-gray-600">Hoặc Tải ảnh lên</label>
+                                     <input type="file" accept="image/*" onChange={(e) => handleBannerUpload('right', e)} className="text-sm" />
+                                 </div>
+                                 
+                                 <div className="w-full h-64 border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                     {bannerForm.rightImage ? (
+                                         <img src={bannerForm.rightImage} className="w-full h-full object-cover" />
+                                     ) : (
+                                         <span className="text-gray-400">Chưa có ảnh</span>
+                                     )}
+                                 </div>
+                                 
+                                 <div className="space-y-2">
+                                     <label className="text-sm font-semibold text-gray-600">Link đích (Khi click vào)</label>
+                                     <input 
+                                         type="text"
+                                         className="w-full px-3 py-2 border rounded-lg text-sm"
+                                         value={bannerForm.rightLink}
+                                         onChange={e => setBannerForm({...bannerForm, rightLink: e.target.value})}
+                                         placeholder="#"
+                                     />
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div className="pt-4 flex justify-end border-t">
+                            <button 
+                                onClick={handleSaveBanners}
+                                className="px-6 py-3 bg-[#006838] text-white rounded-xl font-bold hover:bg-green-700 transition-colors flex items-center gap-2 shadow-lg"
+                            >
+                                <Save size={20} /> Lưu cấu hình Banner
+                            </button>
+                        </div>
+                    </div>
+                 </div>
+            )}
+
             {view === 'list' && (
                 <div className="max-w-6xl mx-auto">
                     <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">

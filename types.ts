@@ -31,3 +31,11 @@ export interface ChatMessage {
   text: string;
   timestamp: Date;
 }
+
+export interface BannerConfig {
+  leftImage: string;
+  leftLink: string;
+  rightImage: string;
+  rightLink: string;
+  isVisible: boolean;
+}

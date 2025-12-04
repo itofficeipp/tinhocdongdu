@@ -1,9 +1,17 @@
 
-import { Category, Product } from './types';
+import { Category, Product, BannerConfig } from './types';
 
 export const STORE_NAME = "Tin Học Đông Du";
 export const CONTACT_PHONE = "0918 620 986";
 export const CONTACT_EMAIL = "info@tinhocdongdu.com";
+
+export const DEFAULT_BANNER_CONFIG: BannerConfig = {
+  isVisible: true,
+  leftImage: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=200&h=600',
+  leftLink: '#',
+  rightImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=200&h=600',
+  rightLink: '#'
+};
 
 export const MOCK_PRODUCTS: Product[] = [
   // PC / Laptop
