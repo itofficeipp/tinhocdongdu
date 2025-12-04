@@ -196,11 +196,24 @@ const App: React.FC = () => {
 
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Helper to handle footer link clicks
-  const handleFooterCategoryClick = (category: string) => {
+  // Unified Handler for navigation clicks (Header & Footer)
+  const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
     setSearchInput(''); // Clear search input
-    document.getElementById('products-grid')?.scrollIntoView({ behavior: 'smooth' });
+    resetFilters();
+    setIsMobileMenuOpen(false); // Close mobile menu if open
+    // Scroll to products grid with a small offset for the sticky header
+    const element = document.getElementById('products-grid');
+    if (element) {
+        const headerOffset = 140; // Approx height of sticky header + top bar
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+        });
+    }
   };
   
   const handleProductClick = (product: Product) => {
@@ -277,11 +290,7 @@ const App: React.FC = () => {
               {menuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    setSelectedCategory(item.id);
-                    setSearchInput(''); // Clear search when switching category
-                    resetFilters();
-                  }}
+                  onClick={() => handleCategoryClick(item.id)}
                   className={`text-xs xl:text-sm font-bold uppercase transition-all relative py-2 group whitespace-nowrap ${
                     selectedCategory === item.id 
                       ? 'text-[#006838]' 
@@ -339,12 +348,7 @@ const App: React.FC = () => {
               {menuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    setSelectedCategory(item.id);
-                    setSearchInput('');
-                    setIsMobileMenuOpen(false);
-                    resetFilters();
-                  }}
+                  onClick={() => handleCategoryClick(item.id)}
                   className={`text-left px-4 py-3 rounded-lg text-sm font-bold uppercase transition-colors ${
                     selectedCategory === item.id 
                       ? 'bg-green-50 text-[#006838]' 
@@ -531,25 +535,25 @@ const App: React.FC = () => {
             <h3 className="text-white text-lg font-bold mb-6 uppercase tracking-wide border-l-4 border-[#006838] pl-3">Sản phẩm chính</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li>
-                <button onClick={() => handleFooterCategoryClick(Category.PC_LAPTOP)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
+                <button onClick={() => handleCategoryClick(Category.PC_LAPTOP)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
                   <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
                   PC / Laptop Doanh Nghiệp
                 </button>
               </li>
               <li>
-                <button onClick={() => handleFooterCategoryClick(Category.SERVER)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
+                <button onClick={() => handleCategoryClick(Category.SERVER)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
                   <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
                   Mực in / Máy in Canon / HP
                 </button>
               </li>
               <li>
-                <button onClick={() => handleFooterCategoryClick(Category.NETWORK)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
+                <button onClick={() => handleCategoryClick(Category.NETWORK)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
                   <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
                   Thiết bị mạng Cisco / Aruba
                 </button>
               </li>
                <li>
-                <button onClick={() => handleFooterCategoryClick(Category.OTHER)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
+                <button onClick={() => handleCategoryClick(Category.OTHER)} className="hover:text-green-400 transition-colors flex items-center gap-3 group text-left w-full">
                   <span className="w-1.5 h-1.5 bg-gray-600 group-hover:bg-green-50 rounded-full transition-colors"></span>
                   Lưu trữ NAS & Thiết bị khác
                 </button>
