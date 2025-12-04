@@ -67,6 +67,16 @@ const App: React.FC = () => {
       .replace(/[\u0300-\u036f]/g, "");
   };
 
+  // SEO: Update Page Title based on navigation
+  useEffect(() => {
+    const categoryLabel = menuItems.find(m => m.id === selectedCategory)?.label || selectedCategory;
+    const pageTitle = debouncedSearchQuery 
+        ? `Tìm kiếm: ${debouncedSearchQuery} - ${STORE_NAME}`
+        : `${categoryLabel} - ${STORE_NAME}`;
+    
+    document.title = pageTitle;
+  }, [selectedCategory, debouncedSearchQuery]);
+
   // 1. Debounce Search Input
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -238,7 +248,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col overflow-x-hidden">
-      {/* Floating Ads */}
+      {/* Floating Ads - Unchanged */}
       <FloatingAds config={bannerConfig} />
 
       {/* Top Bar */}
@@ -261,7 +271,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo Section */}
-            <div className="flex items-center gap-4 group">
+            <div className="flex items-center gap-2 xl:gap-4 group shrink-0">
               <button 
                 className="lg:hidden p-2 -ml-2 text-gray-600 hover:text-green-700 transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -270,7 +280,7 @@ const App: React.FC = () => {
               </button>
               
               <div 
-                className="flex items-center gap-3 select-none cursor-pointer" 
+                className="flex items-center gap-2 sm:gap-3 select-none cursor-pointer" 
                 onClick={() => {
                   setSelectedCategory(Category.PC_LAPTOP);
                   setSearchInput('');
@@ -284,20 +294,21 @@ const App: React.FC = () => {
                   <span className="text-[11px] sm:text-[13px] font-bold text-[#006838] tracking-[0.2em] leading-tight uppercase font-['Montserrat']">
                     Tin Học
                   </span>
-                  <h1 className="text-2xl sm:text-[32px] font-[900] text-[#006838] tracking-tight leading-none uppercase font-['Montserrat']">
+                  <h1 className="text-xl sm:text-2xl xl:text-[32px] font-[900] text-[#006838] tracking-tight leading-none uppercase font-['Montserrat'] whitespace-nowrap">
                     Đông Du
                   </h1>
                 </div>
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 ml-10 xl:ml-16 pr-8 mr-auto">
+            {/* Desktop Navigation - Optimized for Laptop (1366px+) */}
+            {/* Reduced spacing and font size specifically for LG breakpoints to fit search bar */}
+            <nav className="hidden lg:flex items-center space-x-2 xl:space-x-6 ml-4 xl:ml-10 pr-0 mr-auto">
               {menuItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleCategoryClick(item.id)}
-                  className={`text-sm xl:text-base font-[800] uppercase transition-all relative py-2 group whitespace-nowrap tracking-wide ${
+                  className={`text-[10px] xl:text-sm font-[800] uppercase transition-all relative py-2 group whitespace-nowrap tracking-wide ${
                     selectedCategory === item.id 
                       ? 'text-[#006838]' 
                       : 'text-gray-600 hover:text-[#006838]'
@@ -310,20 +321,21 @@ const App: React.FC = () => {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 xl:gap-4 shrink-0">
+              {/* Search Bar - Responsive width */}
               <div className="hidden sm:flex relative group">
                 <input
                   type="text"
                   placeholder="Tìm sản phẩm..."
-                  className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-4 focus:ring-green-500/10 rounded-full text-sm w-48 focus:w-64 transition-all duration-300"
+                  className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-4 focus:ring-green-500/10 rounded-full text-xs xl:text-sm w-32 lg:w-40 xl:w-64 transition-all duration-300 focus:w-48 lg:focus:w-56 xl:focus:w-72"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                 />
-                <Search className="absolute left-3.5 top-3 text-gray-400 group-focus-within:text-green-600 transition-colors" size={16} />
+                <Search className="absolute left-3 top-2.5 text-gray-400 group-focus-within:text-green-600 transition-colors" size={16} />
               </div>
 
               <button 
-                className="relative p-2.5 text-gray-600 hover:text-[#006838] hover:bg-green-50 rounded-full transition-all"
+                className="relative p-2 text-gray-600 hover:text-[#006838] hover:bg-green-50 rounded-full transition-all"
                 onClick={() => setIsCartOpen(true)}
               >
                 <ShoppingCart size={24} />
