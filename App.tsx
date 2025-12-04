@@ -237,7 +237,7 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col">
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex flex-col overflow-x-hidden">
       {/* Floating Ads */}
       <FloatingAds config={bannerConfig} />
 

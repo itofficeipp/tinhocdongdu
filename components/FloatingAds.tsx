@@ -61,7 +61,7 @@ export const FloatingAds: React.FC<FloatingAdsProps> = ({ config }) => {
     <>
       {/* Left Banner */}
       <div 
-         className="hidden 2xl:block fixed left-[calc(50%-860px)] w-[240px] z-20 transition-all duration-75 ease-out animate-fade-in-up"
+         className="hidden xl:block fixed left-[calc(50%-860px)] w-[240px] z-20 transition-all duration-75 ease-out animate-fade-in-up"
          style={{ top: `${styles.top}px`, height: `${BANNER_HEIGHT}px` }}
       >
         <a href={config.leftLink} className="block w-full h-full rounded-lg overflow-hidden shadow-lg border border-gray-100 bg-white hover:scale-[1.02] transition-transform">
@@ -75,7 +75,7 @@ export const FloatingAds: React.FC<FloatingAdsProps> = ({ config }) => {
 
       {/* Right Banner */}
       <div 
-         className="hidden 2xl:block fixed right-[calc(50%-860px)] w-[240px] z-20 transition-all duration-75 ease-out animate-fade-in-up"
+         className="hidden xl:block fixed right-[calc(50%-860px)] w-[240px] z-20 transition-all duration-75 ease-out animate-fade-in-up"
          style={{ top: `${styles.top}px`, height: `${BANNER_HEIGHT}px` }}
       >
         <a href={config.rightLink} className="block w-full h-full rounded-lg overflow-hidden shadow-lg border border-gray-100 bg-white hover:scale-[1.02] transition-transform">
