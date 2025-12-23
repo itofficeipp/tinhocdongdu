@@ -19,6 +19,7 @@ export interface Product {
   image: string;
   isFeatured?: boolean;
   inStock?: boolean;
+  warranty?: string; // Added warranty field
 }
 
 export interface CartItem extends Product {

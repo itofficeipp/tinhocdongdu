@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { X, ShoppingCart, CheckCircle, Tag } from 'lucide-react';
+import { X, ShoppingCart, CheckCircle, Tag, ShieldCheck } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductDetailModalProps {
@@ -64,9 +64,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
             
             <h2 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">{product.name}</h2>
             
-            <div className="text-2xl font-black text-[#006838] mb-6 pb-4 border-b border-gray-100">
+            <div className="text-2xl font-black text-[#006838] mb-2 pb-4 border-b border-gray-100">
                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
             </div>
+            
+            {/* Warranty Info */}
+            {product.warranty && (
+                <div className="flex items-center gap-2 mb-4 text-sm font-semibold text-gray-700">
+                    <ShieldCheck size={18} className="text-[#006838]" />
+                    <span>Bảo hành: {product.warranty}</span>
+                </div>
+            )}
             
             <p className="text-gray-600 mb-6 leading-relaxed text-sm md:text-base">
                 {product.description}
